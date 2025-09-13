@@ -1,2 +1,2 @@
 ## AWS Architecture
-![AWS Infrastructure](./docs/architecture/architecture-diagram.png)
+![AWS Infrastructure](./docs/architecture-diagram.png)
