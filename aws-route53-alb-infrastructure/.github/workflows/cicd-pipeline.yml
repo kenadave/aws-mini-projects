@@ -1,0 +1,110 @@
+name: Multi-Region CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  PRIMARY_REGION: us-east-1
+  SECONDARY_REGION: us-west-2
+  DOMAIN_NAME: kd.com
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Validate CloudFormation Templates
+        run: |
+          aws cloudformation validate-template --template-body file://cloudformation-multi-region-setup.yaml
+          aws cloudformation validate-template --template-body file://cloudformation-secondary-region.yaml
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ env.PRIMARY_REGION }}
+
+  deploy-primary:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    outputs:
+      hosted-zone-id: ${{ steps.deploy.outputs.hosted-zone-id }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy Primary Region
+        id: deploy
+        run: |
+          aws cloudformation deploy \
+            --template-file cloudformation-multi-region-setup.yaml \
+            --stack-name multi-region-primary \
+            --parameter-overrides \
+              DomainName=${{ env.DOMAIN_NAME }} \
+              KeyPairName=${{ secrets.KEY_PAIR_NAME }} \
+            --capabilities CAPABILITY_IAM \
+            --region ${{ env.PRIMARY_REGION }}
+          
+          HOSTED_ZONE_ID=$(aws cloudformation describe-stacks \
+            --stack-name multi-region-primary \
+            --query 'Stacks[0].Outputs[?OutputKey==`HostedZoneId`].OutputValue' \
+            --output text \
+            --region ${{ env.PRIMARY_REGION }})
+          
+          echo "hosted-zone-id=$HOSTED_ZONE_ID" >> $GITHUB_OUTPUT
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  deploy-secondary:
+    needs: deploy-primary
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy Secondary Region
+        run: |
+          aws cloudformation deploy \
+            --template-file cloudformation-secondary-region.yaml \
+            --stack-name multi-region-secondary \
+            --parameter-overrides \
+              DomainName=${{ env.DOMAIN_NAME }} \
+              KeyPairName=${{ secrets.KEY_PAIR_NAME }} \
+              PrimaryHostedZoneId=${{ needs.deploy-primary.outputs.hosted-zone-id }} \
+            --capabilities CAPABILITY_IAM \
+            --region ${{ env.SECONDARY_REGION }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  health-check:
+    needs: [deploy-primary, deploy-secondary]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Health Check Primary Region
+        run: |
+          ALB_DNS=$(aws cloudformation describe-stacks \
+            --stack-name multi-region-primary \
+            --query 'Stacks[0].Outputs[?OutputKey==`LoadBalancerDNS`].OutputValue' \
+            --output text \
+            --region ${{ env.PRIMARY_REGION }})
+          
+          curl -f http://$ALB_DNS || exit 1
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      
+      - name: Health Check Secondary Region
+        run: |
+          ALB_DNS=$(aws cloudformation describe-stacks \
+            --stack-name multi-region-secondary \
+            --query 'Stacks[0].Outputs[?OutputKey==`LoadBalancerDNS`].OutputValue' \
+            --output text \
+            --region ${{ env.SECONDARY_REGION }})
+          
+          curl -f http://$ALB_DNS || exit 1
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
