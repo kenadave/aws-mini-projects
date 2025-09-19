@@ -3,6 +3,7 @@ name: Multi-Region CI/CD Pipeline
 on:
   push:
     branches: [main]
+    paths: ['aws-route53-alb-infrastructure/**']
   pull_request:
     branches: [main]
 
