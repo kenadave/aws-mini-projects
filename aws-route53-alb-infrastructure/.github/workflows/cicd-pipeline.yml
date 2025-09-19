@@ -19,8 +19,8 @@ jobs:
       
       - name: Validate CloudFormation Templates
         run: |
-          aws cloudformation validate-template --template-body file://cloudformation-multi-region-setup.yaml
-          aws cloudformation validate-template --template-body file://cloudformation-secondary-region.yaml
+          aws cloudformation validate-template --template-body file://aws-route53-alb-infrastructure/cloudformation-multi-region-setup.yaml
+          aws cloudformation validate-template --template-body file://aws-route53-alb-infrastructurecloudformation-secondary-region.yaml
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -39,7 +39,7 @@ jobs:
         id: deploy
         run: |
           aws cloudformation deploy \
-            --template-file cloudformation-multi-region-setup.yaml \
+            --template-file aws-route53-alb-infrastructure/cloudformation-multi-region-setup.yaml \
             --stack-name multi-region-primary \
             --parameter-overrides \
               DomainName=${{ env.DOMAIN_NAME }} \
@@ -67,7 +67,7 @@ jobs:
       - name: Deploy Secondary Region
         run: |
           aws cloudformation deploy \
-            --template-file cloudformation-secondary-region.yaml \
+            --template-file aws-route53-alb-infrastructure/cloudformation-secondary-region.yaml \
             --stack-name multi-region-secondary \
             --parameter-overrides \
               DomainName=${{ env.DOMAIN_NAME }} \
