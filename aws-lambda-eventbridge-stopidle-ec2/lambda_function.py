@@ -7,7 +7,7 @@ cloudwatch = boto3.client('cloudwatch')
 INSTANCE_NAME = 'my-app-instance-1'
 CPU_THRESHOLD = 1.0               # percent
 NETWORK_THRESHOLD = 1000000       # bytes (≈1 MB)
-IDLE_PERIOD_MINUTES = 30          # how long to look back
+IDLE_PERIOD_MINUTES = 10          # how long to look back
 # ========================
  
 def lambda_handler(event, context):
