@@ -1,0 +1,9 @@
+{
+    "Name": "CheckIdleEC2",
+    "Arn": "arn:aws:events:us-east-1:020257285671:rule/CheckIdleEC2",
+    "ScheduleExpression": "rate(10 minutes)",
+    "State": "ENABLED",
+    "Description": "",
+    "EventBusName": "default",
+    "CreatedBy": "020257285671"
+}
