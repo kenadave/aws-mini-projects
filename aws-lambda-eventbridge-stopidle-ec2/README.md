@@ -24,7 +24,8 @@ A **serverless AWS automation** that identifies and stops idle EC2 instances usi
 | **EventBridge** | Scheduled Lambda invocation |
 | **IAM** | Role-based access and least privilege |
 | **EC2** | Target instances for monitoring & stop |
- 
+
+![Architecture Diagram](screenshots/architecture-diagram.png) 
 ---
  
 ## 📂 Project Files
@@ -37,7 +38,19 @@ A **serverless AWS automation** that identifies and stops idle EC2 instances usi
 | `/screenshots` | Visual proof (Lambda config, CloudWatch metrics, logs, etc.) |
  
 ---
+
+## 🧮 Cost Optimization Summary
  
+| Component | Continuous EC2 | Automated Setup |
+|------------|----------------|----------------|
+| EC2 (m4a.medium) | ~$5/month | ~$2.5/month |
+| Lambda | - | ~$0 |
+| EventBridge | - | ~$0.04 |
+| CloudWatch | - | ~$0 |
+| **Total** | **$5.00** | **≈ $2.54/month** |
+ 
+💡 **50% cost reduction** for idle compute — scalable for multi-instance environments.
+
 ## 🧩 IAM Policy (Sample)
  
 ```json
