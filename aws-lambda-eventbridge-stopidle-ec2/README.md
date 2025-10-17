@@ -39,19 +39,21 @@ A **serverless AWS automation** that identifies and stops idle EC2 instances usi
  
 ---
 
-## 💰 Cost Optimization Impact
+## 💰 AWS Cost Comparison (Before vs After Automation)
  
-| 🧩 Metric | 💸 Before Automation | ⚙️ After Automation | 📉 Savings |
-|:-----------|:--------------------|:--------------------|:------------|
-| EC2 Instance Monthly Cost | **≈ $40 / month** | **≈ $8 – $20 / month** | ✅ **50 – 80 % reduction** |
-| Annual Cost (Est.) | **≈ $480 / year** | **≈ $96 – $240 / year** | 💵 **Up to $384 saved annually** |
-| Lambda + Monitoring Cost | Negligible (< $0.10 / month) | – | – |
+| 🧩 Service | 💸 Before Automation (Monthly) | ⚙️ After Automation (Monthly) | 📉 Savings |
+|:------------|:-------------------------------|:-------------------------------|:------------|
+| **EC2 Instance (Compute)** | $35.00 | $7.00 – $17.00 | ✅ 50–80% |
+| **EBS Storage (Root Volume)** | $3.00 | $3.00 | ⚙️ No change |
+| **Data Transfer / Networking** | $1.50 | $0.50 | 🔻 Reduced usage |
+| **CloudWatch Monitoring** | $0.30 | $0.30 | ⚙️ No change |
+| **Lambda (Automation Function)** | – | $0.05 | 🪶 Negligible |
+| **EventBridge Scheduler** | – | $0.01 | 🪶 Negligible |
+| **Total (Approx.)** | **$40 / month** | **$8.86 – $20.36 / month** | **💵 50–80% savings** |
  
-**🔹 Result:**  
-By implementing an AWS Lambda function with **EventBridge** and **CloudWatch** to automatically stop idle EC2 instances,  
-the overall infrastructure cost was reduced by **50–80 %** without affecting availability.
- 
-💡 **50% cost reduction** for idle compute — scalable for multi-instance environments.
+✅ **Result:**  
+By using a Lambda + EventBridge setup to automatically stop idle EC2 instances, total monthly cost reduced from **≈ $40 → $9–20**,  
+saving up to **$31/month (~$370/year)** without affecting performance.
 
 ## 🧩 IAM Policy (Sample)
  
