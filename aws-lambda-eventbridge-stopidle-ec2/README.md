@@ -75,4 +75,20 @@ saving up to **$31/month (~$370/year)** without affecting performance.
     }
   ]
 }
+
+
+
+## 💰 AWS Cost Comparison
  
+| Service | Before Automation (Monthly) | After Automation (Monthly) | Quarterly (Before) | Quarterly (After) |
+|:--------|:----------------------------:|:---------------------------:|:------------------:|:-----------------:|
+| **EC2 (Compute)** | $35.00 | $7.00 – $17.00 | $105.00 | $21.00 – $51.00 |
+| **EBS (Storage)** | $3.00 | $3.00 | $9.00 | $9.00 |
+| **Data Transfer** | $1.50 | $0.50 | $4.50 | $1.50 |
+| **CloudWatch** | $0.30 | $0.30 | $0.90 | $0.90 |
+| **Lambda (Automation)** | – | $0.003 | – | $0.009 |
+| **EventBridge (Scheduler)** | – | $0.004 | – | $0.012 |
+| **🧾 Total (Approx.)** | **$40.00 / month** | **$8.29 – $20.80 / month** | **$120.00 / quarter** | **$24.87 – $62.40 / quarter** |
+ 
+✅ **Overall Savings:** ~50 – 80 % reduction in EC2 costs through automated idle-stop using AWS Lambda + EventBridge.
+
